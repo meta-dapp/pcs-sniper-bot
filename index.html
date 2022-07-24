@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+  <link type="text/css" href="./assets/css/materialize.css" rel="stylesheet" media="screen,projection">
+  <link type="text/css" href="./assets/css/styles.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PancakeSwap Sniper Bot</title>
+</head>
+
+<body>
+  <div class="main">
+    <div class="row">
+      <div class="col s12" style="padding: 0px !important; position: fixed; z-index: 100;">
+        <ul class="tabs blue-grey">
+          <li class="tab col s4"><a href="#tab-sniper" class="active">SNIPER</a></li>
+          <li class="tab col s4"><a href="#tab-config">CONFIGURACIÓN</a></li>
+          <li class="tab col s4"><a href="#tab-help">AYUDA</a></li>
+        </ul>
+      </div>
+
+      <div id="tab-sniper" class="tab-content col s12">
+        <div id="init_btn_parent" class="row save-btn">
+          <div id="btn_start" class="row hiddendiv" style="margin-left: 33%;">
+            <button id="init_text" class="waves-effect waves-light btn blue-grey modal-trigger col s6"
+              href="#modal_init">EMPEZAR</button>
+          </div>
+          <div class="row center feedback_loader">
+            <span><span id="bot_init_text"></span>has seleccionado la red <span textid="selected-network"></span> Ve a
+              la pestaña
+              CONFIGURACIÓN
+              para cambiar la red seleccionada,
+              agregar tu dirección y otros datos importantes que necesita el bot para trabajar correctamente.</span>
+            <br><br><span id="running_loader_text" class="hiddendiv">Monitorizando la red en buscar de tokens nuevos con
+              liquidez igual o superior a <span id="min_liquidity_text"></span></span>
+            <div id="running_loader" class="progress hiddendiv">
+              <div class="indeterminate"></div>
+            </div>
+          </div>
+        </div>
+        <div id="sniper_not_tokens" class="inner-content-tab hiddendiv">
+          Aun no has guardado ningún token. Configura y ejecuta el bot si quieres empezar a guardar y comprar tokens
+          y de paso
+          generar
+          el historial de transacciones
+        </div>
+        <ul class="collapsible hiddendiv" style="margin-top: 50px; margin-bottom: 20%;"></ul>
+      </div>
+
+      <div id="tab-config" class="tab-content col s12">
+        <div class="row">
+          <div class="col s12">
+            <h6 class="inner-title-config">Cuenta y Blockchain</h6>
+            <div class="row">
+              <div class="input-field col s3">
+                <select class="icons" id="networks">
+                  <option value="0" disabled selected>Seleccionar red</option>
+                  <option value="bsc" data-icon="assets/images/bsc.png">Binance Smart Chain</option>
+                  <option value="ethereum" data-icon="assets/images/ethereum.png" disabled>Ethereum</option>
+                  <option value="polygon" data-icon="assets/images/polygon.png" disabled>
+                    Polygon
+                  </option>
+                </select>
+              </div>
+              <div class="input-field col s3">
+                <input id="network_time" placeholder="" type="number" class="validate">
+                <label for="network_time">Tiempo de espera del WSS simulado</label>
+                <span class="helper-text">El tiempo que debe
+                  espera el bot por cada monitoreo (segundos)</span>
+              </div>
+              <div class="col s3">
+                <p>
+                  <label class="tooltipped" data-position="top"
+                    data-tooltip="Con esta opción el bot te habilita un botón para que puedas comprar el token facilmente.">
+                    <input id="save_and_buy" name="buy_group" type="radio" />
+                    <span>Guardar y comprar</span>
+                  </label>
+                </p>
+                <p>
+                  <label class="tooltipped" data-position="bottom"
+                    data-tooltip="Con esta opción el bot no te habilita ningún botón de comprar, solo te muestra información del token.">
+                    <input id="just_save" name="buy_group" type="radio" checked />
+                    <span>Sólo guardar</span>
+                  </label>
+                </p>
+              </div>
+              <div class="input-field col s3">
+                <input id="amount_to_buy" placeholder="" type="number" step="any" class="validate">
+                <label for="amount_to_buy">Cantidad de tokens a comprar (BNB)</label>
+                <span class="helper-text">Cantidad de tokens a
+                  comprar si seleccionas la opcion guardar y comprar</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s4">
+                <input id="user_address" placeholder="" type="text" class="validate">
+                <label for="user_address">Tu dirección BEP20 para compras</label>
+                <span class="helper-text">Tu dirección BEP20 de
+                  Metamask/Trustwallet desde donde el bot compra tokens</span>
+              </div>
+              <div class="input-field col s4">
+                <input id="user_address_sell" placeholder="" type="text" class="validate">
+                <label for="user_address_sell">Tu dirección BEP20 para hold</label>
+                <span class="helper-text">Tu dirección BEP20 de
+                  Metamask/Trustwallet donde el bot envia todos los tokens que compra (puede ser la misma que la
+                  anterior)</span>
+              </div>
+              <div class="input-field col s4">
+                <input id="secret_pharse" type="text" class="validate" placeholder="">
+                <label for="secret_pharse">Clave privada de tu dirección BEP20 para compras</label>
+                <span class="helper-text">Puedes obtenerla en tu
+                  Metamask/Trustwallet</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s6">
+                <input id="pcs-router_contract" placeholder="" type="text" class="validate">
+                <label for="pcs-router_contract">Contrato PancakeSwap Router V2</label>
+                <span class="helper-text">No hace falta
+                  rellenarlo</span>
+              </div>
+              <div class="input-field col s6">
+                <input id="wbnb_contract" placeholder="" type="text" class="validate">
+                <label for="wbnb_contract">Contrato WBNB</label>
+                <span class="helper-text">No hace falta
+                  rellenarlo</span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="input-field col s5">
+                <input id="pcs-factory_contract" placeholder="" type="text" class="validate">
+                <label for="pcs-factory_contract">Contrato PancakeSwap Factory V2</label>
+                <span class="helper-text">No hace falta
+                  rellenarlo</span>
+              </div>
+              <div class="input-field col s7">
+                <textarea id="rpc_node_url" rows="4" placeholder="" class="materialize-textarea"
+                  data-length="300"></textarea>
+                <label for="">URLs RPC de la red Binance Smart Chain</label>
+                <span class="helper-text">Puedes varias urls separadas por (;) Usamos múltiples url para evitar el rate
+                  límit de los proveedores rpc. Cuanto más url pongas, menos fallos tendrá el bot</span>
+              </div>
+            </div>
+            <h6 class="inner-title-config">Sniper</h6>
+            <div class="row">
+              <div class="col s3">
+                <p>
+                  <label class="tooltipped" data-position="top"
+                    data-tooltip="En el modo con token el bot monitoriza el token que le pasas esperando a ver si le añaden la liquidez mínima asignada en el campo liquidez minima">
+                    <input id="with_token_mode" name="mode_group" type="radio" checked />
+                    <span>Modo con Token</span>
+                  </label>
+                </p>
+                <p>
+                  <label class="tooltipped" data-position="bottom"
+                    data-tooltip="En el modo automático el bot monitoriza la red esperando a ver si se publica un nuevo token con la liquidez mínima asignada en el campo liquidez minima">
+                    <input id="automatic_mode" name="mode_group" type="radio" />
+                    <span>Modo automático</span>
+                  </label>
+                </p>
+              </div>
+              <div class="input-field col s6">
+                <input id="token_contract" placeholder="" type="text" class="validate">
+                <label for="token_contract">Dirección del Token</label>
+                <span class="helper-text">Si seleccionas Modo con Token, tienes que proporcionar la dirección del token
+                  al
+                  que quieres snipear</span>
+              </div>
+              <div class="input-field col s3">
+                <input id="token_decimals" placeholder="" type="number" class="validate">
+                <label for="token_decimals">Número de decimales del token</label>
+                <span class="helper-text">Número de decimales del
+                  token que quieres snipear</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s3">
+                <input id="min_liquidity" placeholder="" type="number" step="any" class="validate">
+                <label for="min_liquidity">Liquidez mínima para actuar (BNB)</label>
+                <span class="helper-text">La liquidez mínima que
+                  debe tener el token
+                  creado en PancakeSwap</span>
+              </div>
+              <div class="input-field col s3">
+                <input id="slippage" placeholder="" type="number" step="any" class="validate">
+                <label for="slippage">Slippage para comisiones</label>
+                <span class="helper-text">La cantidad de slippage
+                  que desea configurar</span>
+              </div>
+              <div class="input-field col s3">
+                <input id="block_number_auto" placeholder="" type="number" class="validate">
+                <label for="block_number_auto">Número de bloques: Modo automático</label>
+                <span class="helper-text">Número de bloques a
+                  retroceder en el modo automático: >5000 ==> ERROR</span>
+              </div>
+              <div class="input-field col s3">
+                <input id="block_number_addr" placeholder="" type="number" class="validate">
+                <label for="block_number_addr">Número de bloques: Modo con Token</label>
+                <span class="helper-text">Número de bloques a
+                  retroceder en el modo con token: >5000 ==> ERROR</span>
+              </div>
+            </div>
+            <div class="row">
+
+            </div>
+          </div>
+        </div>
+        <div class="row save-btn">
+          <button id="reset-config" class="waves-effect waves-light btn red col s6">RESTABLECER</button>
+          <button id="save-config" class="waves-effect waves-light btn blue-grey col s6">GUARDAR</button>
+        </div>
+      </div>
+
+      <div id="tab-help" class="tab-content col s12">
+        <div class="row save-btn">
+          <button class="waves-effect waves-light btn red col s12" id="go-channel">IR AL CANAL DE
+            YOUTUBE</button><br>
+        </div>
+        <div class="inner-content-tab">
+          ------ PancakeSwap Sniper Bot v1.0.0 [22/07/2022] ------------<br>
+          ------ Bot desarrollado por @metadapp con licencia MIT -------<br>
+          ------ Para más información ve a nuestro canal de Youtube ----<br><br>
+          <label>
+            <input type="checkbox" id="init_bot_auto" />
+            <span>Empezar a ejecutar el bot automaticamente al abrir al aplicación.</span>
+          </label>
+          <br><br>
+          <button id="exit-app-text" class="waves-effect waves-light btn red col s12 modal-trigger"
+            href="#modal_exit">DETENER Y
+            SALIR</button><br><br>
+          <button id="restart-bot-text" class="waves-effect waves-light btn red col s12 modal-trigger"
+            href="#modal_restart">REINICIAR BOT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div id="modal_init" class="modal bottom-sheet">
+      <div class="modal-content">
+        <h6>PancakeSwap Sniper Bot</h6>
+        <p>Al darle a CONTINUAR, el bot empezará monitorizar la red de <span textid="selected-network"></span>
+          realizando
+          acciones de a cuerdo a la configuración, si aun no has configurado el bot, te recomendamos que le des a
+          CANCELAR y vayas a la pestaña de CONFIGURACIÓN para configurar el bot con tus datos.</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-red btn-flat">CANCELAR</a>
+        <a href="#!" id="init" class="modal-close waves-effect waves-green btn blue-grey">CONTINUAR</a>
+      </div>
+    </div>
+    <div id="modal_exit" class="modal bottom-sheet">
+      <div class="modal-content">
+        <h6>PancakeSwap Sniper Bot</h6>
+        <p>Al darle a CONTINUAR, el bot se detendrá y la aplicación se cerrará, cualquier operación pendiente se
+          interrumpirá.
+          Si deseas detener el bot y salir de la aplicación, dale click a CONTINUAR, de lo contrario dale click a
+          CANCELAR
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-red btn-flat">CANCELAR</a>
+        <a href="#!" id="exit-app" class="modal-close waves-effect waves-green btn red">CONTINUAR</a>
+      </div>
+    </div>
+    <div id="modal_restart" class="modal bottom-sheet">
+      <div class="modal-content">
+        <h6>PancakeSwap Sniper Bot</h6>
+        <p>Al darle a CONTINUAR, el bot se reiniciará, cualquier operación pendiente se
+          interrumpirá. Usa esta acción cuando el bot no funcione correctamente.
+          Si deseas reiniciar el bot, dale click a CONTINUAR, de lo contrario dale click a
+          CANCELAR
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-red btn-flat">CANCELAR</a>
+        <a href="#!" id="restart-bot" class="modal-close waves-effect waves-green btn red">CONTINUAR</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="./assets/js/materialize.js"></script>
+  <script src="./renderer.js"></script>
+</body>
+
+</html>

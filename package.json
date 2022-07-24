@@ -1,0 +1,35 @@
+{
+  "name": "pancakeswap-sniper-bot-with-gui",
+  "version": "1.0.0",
+  "description": "A PancakeSwap Sniper Bot with GUI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/meta-dapp/pcs-sniper-bot-gui",
+  "keywords": [
+    "PancakeSwap",
+    "sniper bot",
+    "pcs sniper bot",
+    "pancakeswap sniper bot",
+    "sniper bot with gui",
+    "trading bot nodejs"
+  ],
+  "author": "meta-dapp",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^19.0.8",
+    "electron-reload": "^2.0.0-alpha.1",
+    "electron-reloader": "^1.2.3"
+  },
+  "dependencies": {
+    "node-storage": "0.0.9",
+    "url": "^0.11.0",
+    "axios": "^0.27.2",
+    "chalk": "^4.1.2",
+    "dotenv": "^16.0.1",
+    "ethers": "^5.6.9",
+    "evm-bn": "^1.1.1",
+    "web3": "^1.7.4"
+  }
+}

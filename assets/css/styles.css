@@ -1,0 +1,100 @@
+/* styles.css */
+
+/* Add styles here to customize the appearance of your app */
+
+.tab-content {
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.inner-content-tab {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    color: gray;
+    height: 100px;
+}
+
+.inner-title-config {
+    padding-bottom: 15px;
+}
+
+.save-btn {
+    position: fixed;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin-bottom: -0px;
+}
+
+.bsc {
+    color: orange;
+}
+
+.ethereum {
+    color: black;
+}
+
+.polygon {
+    color: blueviolet;
+}
+
+li.tab a {
+    color: white !important;
+}
+
+.tabs .indicator {
+    background-color: white !important;
+}
+
+.chip {
+    font-size: 13px !important;
+    height: 25px !important;
+    line-height: 25px !important;
+}
+
+.chip>img {
+    height: 25px !important;
+    width: 25px !important;
+}
+
+#running_loader_text {
+    animation: color-change 5s infinite;
+}
+
+@keyframes color-change {
+    0% {
+        color: gray;
+    }
+
+    100% {
+        color: green;
+    }
+}
+
+.feedback_loader {
+    z-index: 1000 !important;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 10px;
+    background-color: white;
+    margin-bottom: 0px !important;
+}
+
+.token-body {
+    border-bottom: 1px solid #ddd;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 2rem
+}
+
+
+.collapsible-header {
+    border-bottom: none !important;
+}
+
+.icon-delete {
+    margin: 10px !important;
+}
