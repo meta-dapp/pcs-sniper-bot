@@ -28,7 +28,13 @@ const defaultConfigValues = {
     numBlocksAuto: 5,
     numBlocksWithToken: 5000,
     initBotAuto: true,
-    botRunning: false
+    botRunning: false,
+    onlyVerifiedTokens: false,
+    explorerApikey: 'apikey del explorador...',
+    sendTelegramAlerts: false,
+    telegramBotTokenId: 'Token id de tu bot de telegram...',
+    telegramChatId: 'Id del chat del grupo donde está tu bot...',
+    autoBuy: false
 }
 
 var intervalMonitor
@@ -50,7 +56,9 @@ window.addEventListener('DOMContentLoaded', () => {
     App = {
         config: {
             save: document.getElementById("save-config"),
-            reset: document.getElementById("reset-config")
+            reset: document.getElementById("reset-config"),
+            onlyVerifiedTokens: document.getElementById('only_verified_tokens'),
+            explorerApikey: document.getElementById('explorer_apikey')
         },
         sniper: {
             selectedNetwork: document.querySelectorAll('span[textid="selected-network"]'),
@@ -218,6 +226,12 @@ function loadEvents() {
         setDefaultConfig()
         saveConfig(e, 'Restablecer', 'Configuración restablecida')
     }
+
+    App.config.onlyVerifiedTokens.addEventListener('change', (e) => {
+        if (e.target.checked)
+            enable(App.config.explorerApikey)
+        else disable(App.config.explorerApikey)
+    })
 }
 
 function openInBrowser(link) {
@@ -340,9 +354,11 @@ function restrictTokenFields(checked) {
     if (checked) {
         document.getElementById('token_contract').disabled = true
         document.getElementById('token_decimals').disabled = true
+        document.getElementById('auto_buy').disabled = true
     } else {
         document.getElementById('token_contract').disabled = false
         document.getElementById('token_decimals').disabled = false
+        document.getElementById('auto_buy').disabled = false
     }
 }
 
@@ -374,12 +390,18 @@ function getAppConfig() {
     const wbnbContract = document.getElementById('wbnb_contract')
     const pcsFactoryContract = document.getElementById('pcs-factory_contract')
     const autoSniping = document.getElementById('automatic_mode')
+    const autoBuy = document.getElementById('auto_buy')
+    const onlyVerifiedTokens = document.getElementById('only_verified_tokens')
+    const sendTelegramAlerts = document.getElementById('send_telegram_alerts')
     const tokenAddress = document.getElementById('token_contract')
     const tokenDecimals = document.getElementById('token_decimals')
     const minLiquidity = document.getElementById('min_liquidity')
     const slippage = document.getElementById('slippage')
     const numBlocksAuto = document.getElementById('block_number_auto')
     const numBlocksWithToken = document.getElementById('block_number_addr')
+    const explorerApikey = document.getElementById('explorer_apikey')
+    const telegramBotTokenId = document.getElementById('telegram_bot_token')
+    const telegramChatId = document.getElementById('telegram_chat_id')
     getRpcUrls()
 
     userConfig.network = network.options[network.selectedIndex < 0 ? 0 : network.selectedIndex].value
@@ -391,9 +413,13 @@ function getAppConfig() {
     userConfig.userAddressSell = userAddressSell.value || userAddressSell.placeholder || userConfig.userAddressSell
     userConfig.secretPhrase = secretPhrase.value || secretPhrase.placeholder || userConfig.secretPhrase
     userConfig.pcsRouterContract = pcsRouterContract.value || pcsRouterContract.placeholder || userConfig.pcsRouterContract
+    userConfig.explorerApikey = explorerApikey.value || explorerApikey.placeholder || userConfig.explorerApikey
+    userConfig.telegramBotTokenId = telegramBotTokenId.value || telegramBotTokenId.placeholder || userConfig.telegramBotTokenId
+    userConfig.telegramChatId = telegramChatId.value || telegramChatId.placeholder || userConfig.telegramChatId
     userConfig.wbnbContract = wbnbContract.value || wbnbContract.placeholder || userConfig.wbnbContract
     userConfig.pcsFactoryContract = pcsFactoryContract.value || pcsFactoryContract.placeholder || userConfig.pcsFactoryContract
     userConfig.autoSniping = autoSniping.checked
+    userConfig.autoBuy = autoBuy.checked
     userConfig.tokenAddress = tokenAddress.value || tokenAddress.placeholder || userConfig.tokenAddress
     userConfig.tokenDecimals = tokenDecimals.value || tokenDecimals.placeholder || userConfig.tokenDecimals
     userConfig.minLiquidity = parseFloat(minLiquidity.value || minLiquidity.placeholder || userConfig.minLiquidity)
@@ -401,6 +427,8 @@ function getAppConfig() {
     userConfig.numBlocksAuto = parseInt(numBlocksAuto.value || numBlocksAuto.placeholder || userConfig.numBlocksAuto)
     userConfig.numBlocksWithToken = parseInt(numBlocksWithToken.value || numBlocksWithToken.placeholder || userConfig.numBlocksWithToken)
     userConfig.initBotAuto = App.help.initBotAuto.checked
+    userConfig.onlyVerifiedTokens = onlyVerifiedTokens.checked
+    userConfig.sendTelegramAlerts = sendTelegramAlerts.checked
 }
 
 function getRpcUrls() {
@@ -422,6 +450,8 @@ function setRpcUrls() {
 }
 
 function setAppConfig() {
+    getDefaultConfigUnique()
+
     const network = document.getElementById('networks')
 
     setSelectedOption(network, userConfig.network)
@@ -445,6 +475,19 @@ function setAppConfig() {
     document.getElementById('block_number_auto').placeholder = userConfig.numBlocksAuto
     document.getElementById('block_number_addr').placeholder = userConfig.numBlocksWithToken
     App.help.initBotAuto.checked = userConfig.initBotAuto
+    document.getElementById('only_verified_tokens').checked = userConfig.onlyVerifiedTokens
+    document.getElementById('explorer_apikey').placeholder = userConfig.explorerApikey
+    document.getElementById('send_telegram_alerts').checked = userConfig.sendTelegramAlerts
+    document.getElementById('telegram_bot_token').placeholder = userConfig.telegramBotTokenId
+    document.getElementById('telegram_chat_id').placeholder = userConfig.telegramChatId
+    document.getElementById('auto_buy').checked = userConfig.autoBuy
+}
+
+function getDefaultConfigUnique() {
+    Object.keys(defaultConfigValues).forEach((key) => {
+        if (!(key in userConfig))
+            userConfig[key] = defaultConfigValues[key]
+    })
 }
 
 function initSelectForm() {

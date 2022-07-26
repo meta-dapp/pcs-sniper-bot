@@ -1,4 +1,5 @@
 const chalk = require('chalk')
+const { isTokenCached } = require('../helpers/TokensCache')
 const { FromWei } = require('../utils/decode')
 const Types = require('../utils/types')
 
@@ -7,10 +8,16 @@ var stopPairSubscription = true
 
 const log = console.log
 
-const _getEvents = async (factory, fromBlock) => {
-    return await factory.getPastEvents('PairCreated', {
+const _getEvents = async (factory, fromBlock, config) => {
+    const options = {
         fromBlock
-    })
+    }
+
+    if (!config.autoSniping)
+        options['filter'] = { token0: config.tokenAddress, token1: config.wbnbContract }
+
+
+    return await factory.getPastEvents('PairCreated', options)
 }
 
 const subscribePairCreated = async (contract, config, callback) => {
@@ -18,10 +25,10 @@ const subscribePairCreated = async (contract, config, callback) => {
     log(chalk.yellow(`Network: ${config.network.toUpperCase()}`))
 
     stopPairSubscription = false
-    const uniquePairsId = []
 
     while (!stopPairSubscription) {
         try {
+            const uniquePairsId = []
 
             const factory = await contract.Instance(Types.FACTORY, config.pcsFactoryContract, config)
             const wbnb = await contract.Instance(Types.TOKEN, config.wbnbContract, config)
@@ -34,12 +41,13 @@ const subscribePairCreated = async (contract, config, callback) => {
 
             log(chalk.yellow(`Block Number: ${fromBlock}`))
 
-            const events = await _getEvents(factory, fromBlock)
+            const events = await _getEvents(factory, fromBlock, config)
 
             if (events && events.length > 0) {
                 for (var i = 0; i < events.length; i++)
                     if (events[i].event === 'PairCreated') {
                         const { token0, token1, pair } = JSON.parse(JSON.stringify(events[i].returnValues).replace('Result', '').trim())
+
                         log(chalk.green(`Processing pair... ${pair}`))
                         const pairData = {
                             token0,
@@ -55,8 +63,14 @@ const subscribePairCreated = async (contract, config, callback) => {
                             good_liquidity: FromWei(bnbBalance, 18) > config.minLiquidity
                         }
 
-                        if (!uniquePairsId.includes(pairData.pair))
-                            uniquePairsId.push(pairData)
+                        if (!isTokenCached(token0.toLowerCase() === config.wbnbContract.toLowerCase() ? token1.toLowerCase() : token0.toLowerCase())) {
+                            const found = uniquePairsId.find(p => {
+                                return p.pair === pairData.pair
+                            })
+
+                            if (!found)
+                                uniquePairsId.push(pairData)
+                        }
                     }
 
                 callback(uniquePairsId)

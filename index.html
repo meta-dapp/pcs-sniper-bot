@@ -165,7 +165,7 @@
                   </label>
                 </p>
               </div>
-              <div class="input-field col s6">
+              <div class="input-field col s3">
                 <input id="token_contract" placeholder="" type="text" class="validate">
                 <label for="token_contract">Dirección del Token</label>
                 <span class="helper-text">Si seleccionas Modo con Token, tienes que proporcionar la dirección del token
@@ -177,6 +177,12 @@
                 <label for="token_decimals">Número de decimales del token</label>
                 <span class="helper-text">Número de decimales del
                   token que quieres snipear</span>
+              </div>
+              <div class="col s3">
+                <label>
+                  <input class="filled-in" type="checkbox" id="auto_buy" />
+                  <span>Comprar automaticamente en el modo con token</span>
+                </label>
               </div>
             </div>
             <div class="row">
@@ -207,7 +213,37 @@
               </div>
             </div>
             <div class="row">
-
+              <div class="col s4">
+                <label>
+                  <input class="filled-in" type="checkbox" id="only_verified_tokens" />
+                  <span>Sólo mostrar tokens verificados</span>
+                </label>
+              </div>
+              <div class="input-field col s6">
+                <input id="explorer_apikey" placeholder="" type="text" class="validate">
+                <label for="explorer_apikey">Apikey del explorador (bscscan) para comprobar si el token está
+                  verificado</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s3">
+                <label>
+                  <input class="filled-in" type="checkbox" id="send_telegram_alerts" />
+                  <span>Enviar alertas a Telegram al encontrar un token</span>
+                </label>
+              </div>
+              <div class="input-field col s4">
+                <input id="telegram_bot_token" placeholder="" type="text" class="validate">
+                <label for="telegram_bot_token">Token id del bot de Telegram</label>
+                <span class="helper-text">El token id del bot de Telegram puedes obtenerlo iniciando un chat con
+                  @botfather</span>
+              </div>
+              <div class="input-field col s5">
+                <input id="telegram_chat_id" placeholder="" type="text" class="validate">
+                <label for="telegram_chat_id">Id del chat del grupo de Telegram</label>
+                <span class="helper-text">El Id del chat del grupo de Telegram donde está el bot puedes obtenerlo
+                  agregando a este @getidsbot en tu grupo</span>
+              </div>
             </div>
           </div>
         </div>
@@ -223,7 +259,7 @@
             YOUTUBE</button><br>
         </div>
         <div class="inner-content-tab">
-          ------ PancakeSwap Sniper Bot v1.0.0 [22/07/2022] ------------<br>
+          ------ PancakeSwap Sniper Bot v1.0.1 [26/07/2022] ------------<br>
           ------ Bot desarrollado por @metadapp con licencia MIT -------<br>
           ------ Para más información ve a nuestro canal de Youtube ----<br><br>
           <label>

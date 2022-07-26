@@ -5,6 +5,8 @@ const Contract = require('./helpers/contract')
 const Decode = require('./utils/decode')
 const Types = require('./utils/types')
 const Web3Wss = require('./services/web3Wss')
+const { isTokenVerifiedBSC } = require('./helpers/checkVerified')
+const { NotifyTelegram } = require('./helpers/TelegramNotify')
 
 var store
 var config, tokens
@@ -28,11 +30,38 @@ const _saveToken = async (pair) => {
 
     const tokenIndex = getTokenIndexByAddress(token.address)
     if (tokenIndex < 0) {
+        var verified = false
+        if (config.onlyVerifiedTokens) {
+            log(chalk.yellow(`Checking token verified... ${token.address}`))
+            try {
+                verified = await isTokenVerifiedBSC(config, token.address.toLowerCase())
+            } catch (err) { }
+        }
+
+        if (config.onlyVerifiedTokens)
+            if (verified)
+                log(chalk.green(`Token Is Verified ✅`))
+            else log(chalk.red(`Token Is Not Verified ❌`))
+
         log(chalk.green(`Saving... ${token.address}`))
         const ContractToken = (await Contract.Instance(Types.TOKEN, token.address, config)).methods
         token['decimals'] = parseInt((await ContractToken.decimals().call()))
         token['name'] = await ContractToken.name().call()
         token['symbol'] = await ContractToken.symbol().call()
+        if (config.sendTelegramAlerts) {
+            if (!config.onlyVerifiedTokens) {
+                log(chalk.yellow(`Checking token verified Telegram... ${token.address}`))
+                try {
+                    verified = await isTokenVerifiedBSC(config, token.address.toLowerCase())
+                } catch (err) { }
+            }
+
+            await NotifyTelegram(config, token, verified)
+        }
+
+        if (config.autoBuy && !config.autoSniping && token.status !== 'bought')
+            await Buy(token, store)
+
         tokens.push(token)
     } else {
         log(chalk.green(`Updating... ${token.address}`))
@@ -42,6 +71,7 @@ const _saveToken = async (pair) => {
         token['liquidity'] = tokens[tokenIndex].liquidity
         if ('transactionHash' in pair) {
             token['transactionHash'] = pair.transactionHash
+            token['status'] = pair.status
             token['buyAmount'] = tokens[tokenIndex].buyAmount > pair.buyAmount ?
                 tokens[tokenIndex].buyAmount : pair.buyAmount
         }
@@ -131,7 +161,7 @@ const Buy = async (token, _store) => {
          Buying ${tokenOut}
          =================
          amountIn: ${amount.toString()} ${tokenIn} WBNB
-         amountOut: ${parseFloat(expectedAmount)} ${tokenOut}}
+         amountOut: ${parseFloat(expectedAmount)} ${tokenOut}
        `))
 
         Decode.ToWei(amountOutMin, token.decimals)

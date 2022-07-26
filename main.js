@@ -118,7 +118,7 @@ async function _getConfig() {
 }
 
 function _getTokens() {
-  const tokens = store.get('tokens') || undefined
+  var tokens = store.get('tokens') || undefined
   return {
     msg: tokens ? 'success' : 'error',
     tokens
