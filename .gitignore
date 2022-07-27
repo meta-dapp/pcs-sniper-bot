@@ -1,4 +1,4 @@
 node_modules
 package-lock.json
-user/config.json
+user/*
 .DS_Store
