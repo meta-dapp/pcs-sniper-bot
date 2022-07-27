@@ -2,15 +2,15 @@
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
-[Español] PancakeSwap Sniper Bot es una aplicación que te permite monitorizar la red Binance Smart Chain/Ethereum/Polygon en buscar de tokens nuevos con liquidez mayor que la mínima configurada
-
-[English] PancakeSwap Sniper Bot is an application that allows you to monitor the Binance Smart Chain/Ethereum/Polygon network in search of new tokens with liquidity greater than the minimum configured
-
 ![alt text](https://github.com/meta-dapp/pcs-sniper-bot/blob/main/assets/images/screenshot1.png?raw=true)
 
 ![alt text](https://github.com/meta-dapp/pcs-sniper-bot/blob/main/assets/images/screenshot2.png?raw=true)
 
-![alt text](https://github.com/meta-dapp/pcs-sniper-bot/blob/main/assets/images/screenshot3.png?raw=true)
+![alt text](https://github.com/meta-dapp/pcs-sniper-bot/blob/main/assets/images/screenshot4.png?raw=true)
+
+[Español] PancakeSwap Sniper Bot es una aplicación que te permite monitorizar la red Binance Smart Chain/Ethereum/Polygon en buscar de tokens nuevos con liquidez mayor que la mínima configurada
+
+[English] PancakeSwap Sniper Bot is an application that allows you to monitor the Binance Smart Chain/Ethereum/Polygon network in search of new tokens with liquidity greater than the minimum configured
 
 ## ¿Cómo funciona? / How it works?
 
@@ -42,3 +42,16 @@ MIT
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
    [yt_channel]: <https://www.youtube.com/channel/UCdRihNiJ0tJ7xpFGKcwZcdQ>
+  
+
+# Changelog
+Todos los cambios notables de todas las versiones
+
+## [1.0.1] - 26/07/2022
+### Novedades
+- Opción de compra automática en el Modo con Token
+- Opción de mostrar sólo Tokens verificados ✅
+- Opción para enviar alertas a Telegram al encontrar Token
+
+### Arreglos
+- Solucionado error: Liquidez no corresponde al Token agregado en Modo con Token
