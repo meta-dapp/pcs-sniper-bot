@@ -53,7 +53,8 @@ const subscribePairCreated = async (contract, config, callback) => {
                             token0,
                             token1,
                             pair,
-                            hash: events[i].transactionHash
+                            hash: events[i].transactionHash,
+                            blockNumber: events[i].blockNumber
                         }
 
                         const bnbBalance = await wbnb.methods.balanceOf(pairData.pair).call()

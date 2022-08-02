@@ -9,6 +9,8 @@ const NotifyTelegram = async (config, token, verified) => {
     <b>Liquidez: </b> ${token.liquidity.toFixed(0)} BNB \n
     <b>Contrato Verificado ${verified ? '✅' : '❌'}</b> \n
     <b>Red: </b> Binance Smart Chain \n
+    <b>¿SCAM?: ${config.checkScam ?
+            (token.isScam ? '🔴 Posible SCAM detectado' : '🔵 Posible SCAM no detectado') : 'Detector desactivado'}</b> \n
     `)
 
     try {

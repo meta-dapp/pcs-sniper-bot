@@ -1,15 +1,22 @@
 // Modules to control application life and create native browser window
+const chalk = require('chalk')
 const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const path = require('path')
+const { CheckScam } = require('./src/helpers/checkScam')
+const { checkProfits } = require('./src/helpers/profits')
 const store = new (require('node-storage'))(path.join(__dirname, 'user/config.json'))
 
 const sleep = (timeMs) => new Promise(resolve => setTimeout(resolve, timeMs))
-const { Init, Stop, Buy } = require('./src/sniper')
+const { Init, Stop, Buy, Sell } = require('./src/sniper')
+const { getTokenIndexByAddress } = require('./src/utils/token')
 
 var isBotRunning = false
 
 process.on('uncaughtException', function (error) {
   console.log('-----RATE LIMIT/TIMEOUT-----')
+})
+process.on('UnhandledPromiseRejectionWarning', function (error) {
+  console.log('-----RETRY-----')
 })
 
 function createWindow() {
@@ -85,6 +92,9 @@ ipcMain.handle('save-tokens', async (event, data) => {
 ipcMain.handle('buy-token', async (event, data) => {
   return await _buyToken(data)
 })
+ipcMain.handle('sell-token', async (event, data) => {
+  return await _sellToken(data)
+})
 
 /// FUNCTIONS
 async function _saveConfig(data) {
@@ -128,13 +138,18 @@ function _getTokens() {
 async function _initBot() {
   await Init(store)
   isBotRunning = true
+  broadcastTokens()
   return await _getConfig()
 }
 
 async function _buyToken(token) {
   try {
     await Buy(token, store)
-    return _getTokens()
+
+    await sleep(1000)
+    return {
+      msg: 'success'
+    }
   } catch (err) {
     return {
       msg: 'error'
@@ -142,6 +157,56 @@ async function _buyToken(token) {
   }
 }
 
+async function _sellToken(token) {
+  try {
+    await Sell(token, store)
+    const tokenIndex = getTokenIndexByAddress(token.address, store.get('tokens'))
+    if (tokenIndex)
+      store.get('tokens').slice(tokenIndex, 1)
+
+    await sleep(1000)
+    return {
+      msg: 'success'
+    }
+  } catch (err) {
+    return {
+      msg: 'error'
+    }
+  }
+}
+
+async function broadcastTokens() {
+  while (true) {
+    const tokens = store.get('tokens')
+    const config = store.get('config')
+
+    if (tokens && tokens.length > 0)
+      for (var i = 0; i < tokens.length; i++) {
+        const token = tokens[i]
+        if (config.checkScam && !token.isScam) {
+          try {
+            console.log(chalk.red('Checking SCAM...'))
+            const isScam = await CheckScam(token, config)
+            token['isScam'] = isScam
+          } catch (err) { }
+        }
+
+        if (token.status === 'bought') {
+          try {
+            console.log(chalk.blue('Checking Profits...'))
+            const response = await checkProfits(token.address)
+            token['profit'] = response.profitPercent < 0 ? `-${response.profit.toString().replace('-', '').replace('+', '')}` : `+${response.profit.toString().replace('+', '').replace('-', '')}`
+            token['profitText'] = response.msg
+            token['profitPercent'] = response.profitPercent < 0 ? `-${response.profitPercent.toString().replace('-', '')}` : `+${response.profitPercent.toString().replace('+', '')}`
+          } catch (err) { }
+
+        }
+      }
+
+    store.put('tokens', tokens)
+    await sleep(6000)
+  }
+}
 
 async function _stopBot() {
   Stop()

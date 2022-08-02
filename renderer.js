@@ -16,9 +16,7 @@ const defaultConfigValues = {
         'https://bsc-dataseed.binance.org',
         'https://bsc-mainnet.nodereal.io/v1/7879c689f5b34260ad2e4ebf962f2f6c',
         'https://bscrpc.com',
-        'https://bsc-dataseed1.binance.org',
-        'https://rpc.ankr.com/bsc',
-        'https://bsc-mainnet.nodereal.io/v1/64a9df0874fb4a93b9d0a3849de012d3',
+        'https://bsc-dataseed1.binance.org'
     ],
     autoSniping: true,
     tokenAddress: NULL_ADDRESS,
@@ -34,7 +32,10 @@ const defaultConfigValues = {
     sendTelegramAlerts: false,
     telegramBotTokenId: 'Token id de tu bot de telegram...',
     telegramChatId: 'Id del chat del grupo donde está tu bot...',
-    autoBuy: false
+    autoBuy: false,
+    sellInProfits: false,
+    profitPercent: 10,
+    checkScam: true
 }
 
 var intervalMonitor
@@ -58,7 +59,12 @@ window.addEventListener('DOMContentLoaded', () => {
             save: document.getElementById("save-config"),
             reset: document.getElementById("reset-config"),
             onlyVerifiedTokens: document.getElementById('only_verified_tokens'),
-            explorerApikey: document.getElementById('explorer_apikey')
+            explorerApikey: document.getElementById('explorer_apikey'),
+            sellInProfits: document.getElementById('sell_in_profits'),
+            profitPercent: document.getElementById('profit_percent'),
+            sendTelegramAlerts: document.getElementById('send_telegram_alerts'),
+            telegramBotTokenId: document.getElementById('telegram_bot_token'),
+            telegramChatId: document.getElementById('telegram_chat_id')
         },
         sniper: {
             selectedNetwork: document.querySelectorAll('span[textid="selected-network"]'),
@@ -95,8 +101,8 @@ function getTokens() {
     API.getTokens().then((data) => {
         if (data.msg === 'success')
             localData.tokens = data.tokens
-        else API.saveTokens(localData.tokens)
 
+        console.log(localData.tokens)
         setupTokensElements()
     })
 }
@@ -232,6 +238,22 @@ function loadEvents() {
             enable(App.config.explorerApikey)
         else disable(App.config.explorerApikey)
     })
+
+    App.config.sellInProfits.addEventListener('change', (e) => {
+        if (e.target.checked)
+            enable(App.config.profitPercent)
+        else disable(App.config.profitPercent)
+    })
+
+    App.config.sendTelegramAlerts.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            enable(App.config.telegramBotTokenId)
+            enable(App.config.telegramChatId)
+        } else {
+            disable(App.config.telegramBotTokenId)
+            disable(App.config.telegramChatId)
+        }
+    })
 }
 
 function openInBrowser(link) {
@@ -288,6 +310,17 @@ function buyToken(address) {
     })
 }
 
+function sellToken(address) {
+    msg('Vendiendo token...')
+    API.sellToken(getTokenByAddress(address)).then((data) => {
+        if (data.msg === 'success') {
+            msg('Token vendido correctamente!')
+        } else {
+            msg('Ha ocurrido un error: Prueba de nuevo o honeypot')
+        }
+    })
+}
+
 function getBuyButton(token) {
     if (token.buyAmount <= 0 && userConfig.saveAndBuy)
         return `<div class="col s3">
@@ -296,8 +329,8 @@ function getBuyButton(token) {
 
     if (token.buyAmount > 0)
         return `<div class="col s3">
-                            <button disabled class="btn green">Comprado</button>
-                        </div>`
+                    <button onclick="sellToken('${token.address}')" class="btn red">Vender</button>
+                </div>`
 
     return ''
 }
@@ -324,7 +357,8 @@ function getTokenHTML(token) {
                     </div>
                     <div class="col s6">
                     Token: ${token.address}<br>
-                    <span>${token.name} (${token.symbol})</span>
+                    <span>${token.name} (${token.symbol}) </span><br>
+                    ${getTokenScamHTML(token)}
                     </div>
                 </div>
                 <div class="row">
@@ -337,8 +371,40 @@ function getTokenHTML(token) {
                         <button onclick="deleteToken('${token.address}')" class="btn red">Borrar token</button>
                     </div>
                 </div>
+                ${token.status === 'bought' ? '<hr><br>' : ''}
+                <div class="row">
+                    ${getProfitsHTML(token)}
+                </div>
                 </div>
             </li>`
+}
+
+function getCurrentValue(profit, value) {
+    var numerValue = parseFloat(profit.toString().replace('+', '').replace('-', ''))
+    numerValue = parseFloat((profit.toString().includes('+') ? numerValue : -1 * numerValue) + value).toFixed(6)
+    return profit.toString().includes('+') ? `${numerValue}` : numerValue
+}
+
+function getProfitsHTML(token) {
+    return token.status === 'bought' ? `<div class="col s2">
+                <span class="badge ${token.profitPercent >= 0 ? 'green' : 'red'}">Actual: ${getCurrentValue(token.profit, token.buyAmount)} BNB</span>
+            </div>
+            <div class="col s3">
+                <span class="badge ${token.profitPercent >= 0 ? 'green' : 'red'}">Profit: ${token.profit} BNB</span>
+            </div>
+            <div class="col s3">
+                <span class="badge ${token.profitPercent >= 0 ? 'green' : 'red'}">Profit: ${token.profitPercent}%</span>
+            </div>
+            <div class="col s4">
+                <span class="badge ${token.profitPercent >= 0 ? 'green' : 'red'}">${token.profitText}</span>
+            </div>` : ''
+}
+
+function getTokenScamHTML(token) {
+    return userConfig.checkScam ?
+        `<span class="badge scam-badge ${token.isScam ? 'red' : 'blue'}">POSIBLE ${(token.isScam ? 'SCAM' : 'SCAM NO') + ' DETECTADO (BETA: DYOR)'}</span>
+        ` : ''
+
 }
 
 function getNetworkExplorer(network, endpoint) {
@@ -402,6 +468,9 @@ function getAppConfig() {
     const explorerApikey = document.getElementById('explorer_apikey')
     const telegramBotTokenId = document.getElementById('telegram_bot_token')
     const telegramChatId = document.getElementById('telegram_chat_id')
+    const checkScam = document.getElementById('check_scam')
+    const sellInProfits = document.getElementById('sell_in_profits')
+    const profitPercent = document.getElementById('profit_percent')
     getRpcUrls()
 
     userConfig.network = network.options[network.selectedIndex < 0 ? 0 : network.selectedIndex].value
@@ -420,6 +489,8 @@ function getAppConfig() {
     userConfig.pcsFactoryContract = pcsFactoryContract.value || pcsFactoryContract.placeholder || userConfig.pcsFactoryContract
     userConfig.autoSniping = autoSniping.checked
     userConfig.autoBuy = autoBuy.checked
+    userConfig.checkScam = checkScam.checked
+    userConfig.sellInProfits = sellInProfits.checked
     userConfig.tokenAddress = tokenAddress.value || tokenAddress.placeholder || userConfig.tokenAddress
     userConfig.tokenDecimals = tokenDecimals.value || tokenDecimals.placeholder || userConfig.tokenDecimals
     userConfig.minLiquidity = parseFloat(minLiquidity.value || minLiquidity.placeholder || userConfig.minLiquidity)
@@ -429,6 +500,7 @@ function getAppConfig() {
     userConfig.initBotAuto = App.help.initBotAuto.checked
     userConfig.onlyVerifiedTokens = onlyVerifiedTokens.checked
     userConfig.sendTelegramAlerts = sendTelegramAlerts.checked
+    userConfig.profitPercent = parseFloat(profitPercent.value || profitPercent.placeholder || userConfig.profitPercent).toFixed(1)
 }
 
 function getRpcUrls() {
@@ -481,6 +553,9 @@ function setAppConfig() {
     document.getElementById('telegram_bot_token').placeholder = userConfig.telegramBotTokenId
     document.getElementById('telegram_chat_id').placeholder = userConfig.telegramChatId
     document.getElementById('auto_buy').checked = userConfig.autoBuy
+    document.getElementById('profit_percent').placeholder = userConfig.profitPercent
+    document.getElementById('sell_in_profits').checked = userConfig.sellInProfits
+    document.getElementById('check_scam').checked = userConfig.checkScam
 }
 
 function getDefaultConfigUnique() {

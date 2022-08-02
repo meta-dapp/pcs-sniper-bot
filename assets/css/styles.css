@@ -98,3 +98,11 @@ li.tab a {
 .icon-delete {
     margin: 10px !important;
 }
+
+.scam-badge {
+    margin-left: 0px !important;
+    text-align: left !important;
+    float: none !important;
+    padding: 2px 5px 2px 5px !important;
+    color: white !important;
+}

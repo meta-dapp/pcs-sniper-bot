@@ -7,6 +7,7 @@ const Types = require('./utils/types')
 const Web3Wss = require('./services/web3Wss')
 const { isTokenVerifiedBSC } = require('./helpers/checkVerified')
 const { NotifyTelegram } = require('./helpers/TelegramNotify')
+const { CheckScam } = require('./helpers/checkScam')
 
 var store
 var config, tokens
@@ -25,7 +26,14 @@ const _saveToken = async (pair) => {
         network: pair.network,
         pair: pair.pair,
         buyAmount: 0,
-        decimals: 18
+        amountTokens: 0,
+        decimals: 18,
+        blockNumber: pair.blockNumber,
+        soldAmount: 0,
+        profit: 0,
+        profitPercent: 0,
+        profitText: 'Checking profits...',
+        isScam: false
     }
 
     const tokenIndex = getTokenIndexByAddress(token.address)
@@ -48,6 +56,8 @@ const _saveToken = async (pair) => {
         token['decimals'] = parseInt((await ContractToken.decimals().call()))
         token['name'] = await ContractToken.name().call()
         token['symbol'] = await ContractToken.symbol().call()
+        if (config.checkScam)
+            token['isScam'] = await CheckScam(token, config)
         if (config.sendTelegramAlerts) {
             if (!config.onlyVerifiedTokens) {
                 log(chalk.yellow(`Checking token verified Telegram... ${token.address}`))
@@ -69,11 +79,23 @@ const _saveToken = async (pair) => {
         token['name'] = tokens[tokenIndex].name
         token['symbol'] = tokens[tokenIndex].symbol
         token['liquidity'] = tokens[tokenIndex].liquidity
+        token['blockNumber'] = tokens[tokenIndex].blockNumber
+        if (config.checkScam && !tokens[tokenIndex].isScam)
+            token['isScam'] = token.isScam || tokens[tokenIndex].isScam
+
         if ('transactionHash' in pair) {
             token['transactionHash'] = pair.transactionHash
             token['status'] = pair.status
             token['buyAmount'] = tokens[tokenIndex].buyAmount > pair.buyAmount ?
                 tokens[tokenIndex].buyAmount : pair.buyAmount
+            token['amountTokens'] = tokens[tokenIndex].amountTokens > pair.amountTokens ?
+                tokens[tokenIndex].amountTokens : pair.amountTokens
+
+            token['soldAmount'] = tokens[tokenIndex].soldAmount > pair.soldAmount ?
+                tokens[tokenIndex].soldAmount : pair.soldAmount
+            token['status'] = pair.status
+            token['profit'] = tokens[tokenIndex].profit
+            token['profitPercent'] = tokens[tokenIndex].profitPercent
         }
         tokens[tokenIndex] = token
     }
@@ -121,6 +143,74 @@ const Init = async (_store) => {
             }
         }
     })
+}
+
+const Sell = async (token, _store) => {
+    store = _store
+    updateLocalStore()
+
+    const amount = token.amountTokens
+    const ContractPCS = (await Contract.Instance(Types.ROUTER, config.pcsRouterContract, config)).methods
+    const ContractToken = (await Contract.Instance(Types.TOKEN, token.address, config)).methods
+    const tokenIn = token.address
+    const tokenOut = config.wbnbContract
+
+    const amountIn = Decode.ToWei(token.amountTokens, token.decimals)
+
+    log(chalk.yellow(`Checking ${token.name} allowance...`))
+    var tx = {}
+    const supply = await ContractToken.totalSupply().call()
+    const allowance = await ContractToken.allowance(config.userAddress, config.pcsRouterContract).call()
+
+    if (Decode.FromWei(allowance.toString(), token.decimals) >= Decode.FromWei(supply.toString(), token.decimals)) {
+        log(chalk.red('Already approved'))
+        tx['status'] = true
+    } else {
+        log(chalk.yellow('Approving...'))
+        tx = await ContractToken.approve(
+            config.pcsRouterContract,
+            Web3.utils.toBN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').toString()
+        ).send()
+    }
+
+    if (tx.status) {
+        const amounts = await ContractPCS.getAmountsOut(amountIn, [tokenIn, tokenOut]).call()
+        var amountOutMin = Decode.FromWei(amounts[amounts.length - 1], config.wbnbContract)
+        const expectedAmount = amountOutMin
+        amountOutMin -= ((amountOutMin * (config.slippage / 100)))
+
+        log(chalk.red(`
+         Selling ${tokenOut}
+         =================
+         amountIn: ${amount.toString()} ${tokenIn} ${token.name}
+         amountOut: ${parseFloat(expectedAmount)} ${tokenOut} WBNB
+       `))
+
+        Decode.ToWei(amountOutMin, 18)
+        const tx2 = await ContractPCS.swapExactTokensForETH(
+            amountIn,
+            Decode.ToWei(amountOutMin, 18),
+            [tokenIn, tokenOut],
+            config.userAddressSell,
+            Date.now() + 1000 * 60 * 10
+        ).send({ value: amountIn.toString(), gas: 1000000 })
+
+        if (tx2.status) {
+            const receipt = await tx2.transactionHash
+
+            log(chalk.red(
+                `${tokenOut} sold successfully`))
+            log(chalk.red(`https://bscscan.com/tx/${receipt}`))
+            log(chalk.red('================='))
+
+            token['transactionHash'] = receipt
+            token['soldAmount'] = parseFloat(expectedAmount)
+            token['status'] = 'sold'
+
+            await _saveToken(token)
+        } else log(chalk.red(`ERROR: can't buy ${tokenOut}`))
+    } else
+        log(chalk.red(`ERROR: Not allowence for ${tokenOut}`))
 }
 
 const Buy = async (token, _store) => {
@@ -182,7 +272,7 @@ const Buy = async (token, _store) => {
 
             token['transactionHash'] = receipt
             token['buyAmount'] = amount
-            token['tokenAmount'] = parseFloat(expectedAmount)
+            token['amountTokens'] = token.amountTokens + parseFloat(expectedAmount)
             token['status'] = 'bought'
 
             await _saveToken(token)
@@ -199,5 +289,6 @@ function Stop() {
 module.exports = {
     Init,
     Stop,
-    Buy
+    Buy,
+    Sell
 }

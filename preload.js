@@ -9,5 +9,6 @@ contextBridge.exposeInMainWorld('api', {
   exitApp: () => ipcRenderer.invoke('exit-app'),
   initBot: () => ipcRenderer.invoke('init-bot'),
   restartBot: () => ipcRenderer.invoke('restart-bot'),
-  buyToken: (token) => ipcRenderer.invoke('buy-token', token)
+  buyToken: (token) => ipcRenderer.invoke('buy-token', token),
+  sellToken: (token) => ipcRenderer.invoke('sell-token', token)
 })
