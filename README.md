@@ -2,11 +2,11 @@
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
-![alt text](https://github.com/meta-dapp/pcs-sniper-bot/blob/main/assets/images/screenshot1.png?raw=true)
+![alt text](https://github.com/meta-dapp/pcs-sniper-bot/blob/main/assets/images/screenshot6.png?raw=true)
 
 ![alt text](https://github.com/meta-dapp/pcs-sniper-bot/blob/main/assets/images/screenshot2.png?raw=true)
 
-![alt text](https://github.com/meta-dapp/pcs-sniper-bot/blob/main/assets/images/screenshot4.png?raw=true)
+![alt text](https://github.com/meta-dapp/pcs-sniper-bot/blob/main/assets/images/screenshot5.png?raw=true)
 
 [Español] PancakeSwap Sniper Bot es una aplicación que te permite monitorizar la red Binance Smart Chain/Ethereum/Polygon en buscar de tokens nuevos con liquidez mayor que la mínima configurada
 
@@ -55,3 +55,10 @@ Todos los cambios notables de todas las versiones
 
 ### Arreglos
 - Solucionado error: Liquidez no corresponde al Token agregado en Modo con Token
+
+
+## [1.0.2] - 02/08/2022
+### Novedades
+- Opción de venta automática y manual agregada
+- Detector de SCAM agregado (BETA: DYOR) ✅
+- Venta automática con take profit por porcentaje ✅
