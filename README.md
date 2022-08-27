@@ -42,6 +42,8 @@ MIT
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
    [yt_channel]: <https://www.youtube.com/channel/UCdRihNiJ0tJ7xpFGKcwZcdQ>
+   [uniswap_link]: <https://github.com/meta-dapp/uniswap-sniper-bot>
+   [quickswap_link]: <https://github.com/meta-dapp/quickswap-sniper-bot>
   
 
 # Changelog
@@ -61,3 +63,8 @@ Todos los cambios notables de todas las versiones
 
 ### Arreglos
 - Solucionado error: Liquidez no corresponde al Token agregado en Modo con Token
+
+## Versiones para otras blockchain
+
+- [Quickswap Sniper Bot][quickswap_link]
+- [Uniswap Sniper Bot][uniswap_link]  

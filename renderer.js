@@ -64,7 +64,8 @@ window.addEventListener('DOMContentLoaded', () => {
             profitPercent: document.getElementById('profit_percent'),
             sendTelegramAlerts: document.getElementById('send_telegram_alerts'),
             telegramBotTokenId: document.getElementById('telegram_bot_token'),
-            telegramChatId: document.getElementById('telegram_chat_id')
+            telegramChatId: document.getElementById('telegram_chat_id'),
+            tokenSymbolText: document.getElementById('token_symbol_text')
         },
         sniper: {
             selectedNetwork: document.querySelectorAll('span[textid="selected-network"]'),
@@ -522,11 +523,13 @@ function setRpcUrls() {
 }
 
 function setAppConfig() {
+
     getDefaultConfigUnique()
 
     const network = document.getElementById('networks')
 
     setSelectedOption(network, userConfig.network)
+
     setRpcUrls()
     document.getElementById('network_time').placeholder = userConfig.wssWaitTime
     document.getElementById('save_and_buy').checked = userConfig.saveAndBuy
@@ -580,6 +583,7 @@ function setSelectedOption(select, option) {
                 networkSelectionForm[0].destroy()
                 select.innerHTML = conserve
                 initSelectForm()
+                replaceText(App.config.tokenSymbolText, getNetworkCoinSymbol(userConfig.network))
             } catch (err) { }
             return
         }
@@ -628,6 +632,7 @@ function getNetworkCoinSymbol(network) {
     return {
         bsc: 'BNB',
         ethereum: 'ETH',
-        polygon: 'MATIC'
+        polygon: 'MATIC',
+        avalanche: 'AVAX'
     }[network]
 }

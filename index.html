@@ -61,9 +61,13 @@
                 <select class="icons" id="networks">
                   <option value="0" disabled selected>Seleccionar red</option>
                   <option value="bsc" data-icon="assets/images/bsc.png">Binance Smart Chain</option>
-                  <option value="ethereum" data-icon="assets/images/ethereum.png" disabled>Ethereum</option>
+                  <option value="ethereum" data-icon="assets/images/ethereum.png" disabled>Ethereum (Uniswap Sniper Bot)
+                  </option>
                   <option value="polygon" data-icon="assets/images/polygon.png" disabled>
-                    Polygon
+                    Polygon (Quickswap Sniper Bot)
+                  </option>
+                  <option value="avalanche" data-icon="assets/images/avalanche.png" disabled>
+                    Avalanche (Pangolin Sniper Bot)
                   </option>
                 </select>
               </div>
@@ -91,7 +95,7 @@
               </div>
               <div class="input-field col s3">
                 <input id="amount_to_buy" placeholder="" type="number" step="any" class="validate">
-                <label for="amount_to_buy">Cantidad de tokens a comprar (BNB)</label>
+                <label for="amount_to_buy">Cantidad de tokens a comprar (<span id="token_symbol_text"></span>)</label>
                 <span class="helper-text">Cantidad de tokens a
                   comprar si seleccionas la opcion guardar y comprar</span>
               </div>
