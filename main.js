@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 const chalk = require('chalk')
-const { app, BrowserWindow, ipcMain, Menu } = require('electron')
+const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron')
 const path = require('path')
 const { CheckScam } = require('./src/helpers/checkScam')
 const { checkProfits } = require('./src/helpers/profits')
@@ -83,6 +83,9 @@ ipcMain.handle('init-bot', async (event, data) => {
 
 ipcMain.handle('get-tokens', async (event) => {
   return _getTokens()
+})
+ipcMain.handle('open-link', async (event, url) => {
+  shell.openExternal(url)
 })
 
 ipcMain.handle('save-tokens', async (event, data) => {

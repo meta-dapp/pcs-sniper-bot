@@ -5,7 +5,7 @@ contextBridge.exposeInMainWorld('api', {
   getConfig: () => ipcRenderer.invoke('get-config'),
   getTokens: () => ipcRenderer.invoke('get-tokens'),
   saveTokens: (tokens) => ipcRenderer.invoke('save-tokens', tokens),
-  openWebBrowser: (url) => shell.openExternal(url),
+  openWebBrowser: (url) => ipcRenderer.invoke('open-link', url),
   exitApp: () => ipcRenderer.invoke('exit-app'),
   initBot: () => ipcRenderer.invoke('init-bot'),
   restartBot: () => ipcRenderer.invoke('restart-bot'),

@@ -15,7 +15,7 @@ const log = console.log
 
 const updateLocalStore = () => {
     config = store.get('config')
-    tokens = store.get('tokens')
+    tokens = store.get('tokens') || []
 }
 
 const _saveToken = async (pair) => {

@@ -1,4 +1,4 @@
-# PancakeSwap Sniper Bot 
+# PancakeSwap Sniper Bot
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
@@ -14,7 +14,7 @@
 
 ## ¿Cómo funciona? / How it works?
 
-- [VER VIDEO][yt_channel] 
+- [VER VIDEO][yt_channel]
 - [CHECK VIDEO][yt_channel]
 
 ## Instalación/Installation
@@ -39,32 +39,36 @@ npm star dev
 MIT
 **PancakeSwap Sniper Bot v1.0.0**
 
-[//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
-
-   [yt_channel]: <https://www.youtube.com/channel/UCdRihNiJ0tJ7xpFGKcwZcdQ>
-   [uniswap_link]: <https://github.com/meta-dapp/uniswap-sniper-bot>
-   [quickswap_link]: <https://github.com/meta-dapp/quickswap-sniper-bot>
-  
+[//]: # "These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax"
+[yt_channel]: https://www.youtube.com/channel/UCdRihNiJ0tJ7xpFGKcwZcdQ
+[uniswap_link]: https://github.com/meta-dapp/uniswap-sniper-bot
+[quickswap_link]: https://github.com/meta-dapp/quickswap-sniper-bot
 
 # Changelog
+
 Todos los cambios notables de todas las versiones
 
-## [1.0.2] - 02/08/2022
+## [1.0.3] - 6/06/2023
+
 ### Novedades
+
 - Opción de venta automática y manual agregada
 - Detector de SCAM agregado (BETA: DYOR) ✅
 - Venta automática con take profit por porcentaje ✅
 
 ## [1.0.1] - 26/07/2022
+
 ### Novedades
+
 - Opción de compra automática en el Modo con Token
 - Opción de mostrar sólo Tokens verificados ✅
 - Opción para enviar alertas a Telegram al encontrar Token
 
 ### Arreglos
+
 - Solucionado error: Liquidez no corresponde al Token agregado en Modo con Token
 
 ## Versiones para otras blockchain
 
 - [Quickswap Sniper Bot][quickswap_link]
-- [Uniswap Sniper Bot][uniswap_link]  
+- [Uniswap Sniper Bot][uniswap_link]

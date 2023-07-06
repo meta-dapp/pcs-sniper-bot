@@ -1,6 +1,6 @@
 {
   "name": "pancakeswap-sniper-bot-with-gui",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A PancakeSwap Sniper Bot with GUI",
   "main": "main.js",
   "scripts": {

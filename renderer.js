@@ -14,7 +14,7 @@ const defaultConfigValues = {
     pcsFactoryContract: '0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73',
     rpcURL: [
         'https://bsc-dataseed.binance.org',
-        'https://bsc-mainnet.nodereal.io/v1/7879c689f5b34260ad2e4ebf962f2f6c',
+        'https://bsc-mainnet.nodereal.io/v1/a986025b4eae4b82b9c2d577c730d09a',
         'https://bscrpc.com',
         'https://bsc-dataseed1.binance.org'
     ],
