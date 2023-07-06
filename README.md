@@ -48,7 +48,15 @@ MIT
 
 Todos los cambios notables de todas las versiones
 
-## [1.0.3] - 6/06/2023
+## [1.0.3] - 06/07/2023
+
+### Arreglos
+
+- Abrir enlaces externos ✅
+- Detectar tokens ✅
+- Cambiar rpc por defecto de nodereal ✅
+
+## [1.0.2] - 06/08/2022
 
 ### Novedades
 
